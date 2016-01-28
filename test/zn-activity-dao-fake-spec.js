@@ -5,6 +5,7 @@ describe('ZnActivityDaoFake', function() {
 	var Promise = require('bluebird');
 
 	var ZnActivityDaoFake = require('../src/zn-activity-dao-fake.js');
+	var ZnActivity = require('zn-resource')('activity');
 
 	var znActivityDaoFake;
 
@@ -23,7 +24,7 @@ describe('ZnActivityDaoFake', function() {
 			znActivityDaoFake.save(activity);
 
 			znActivityDaoFake.get(12).then(function(dbActivity) {
-				expect(dbActivity).toEqual(activity);
+				expect(dbActivity.id).toEqual(activity.id);
 				done();
 			});
 		});
@@ -45,8 +46,8 @@ describe('ZnActivityDaoFake', function() {
 			var p2 = znActivityDaoFake.get(13);
 
 			Promise.all([p1, p2]).then(function(dbActivities) {
-				expect(dbActivities[0]).toEqual(activity1);
-				expect(dbActivities[1]).toEqual(activity2);
+				expect(dbActivities[0].id).toEqual(activity1.id);
+				expect(dbActivities[1].id).toEqual(activity2.id);
 			})
 			.catch(function(err) {
 				fail(err);
@@ -63,13 +64,28 @@ describe('ZnActivityDaoFake', function() {
 			};
 
 			znActivityDaoFake.save(activity).then(function(dbActivity) {
-				expect(dbActivity).toEqual(activity);
+				expect(dbActivity.id).toEqual(activity.id);
+				expect(dbActivity instanceof ZnActivity).toBe(true);
 				done();
 			});
 		});
 	});
 
 	describe('get', function() {
+
+		it('should return activity as resolved promised', function(done) {
+
+			var activity = {
+				id: 12
+			};
+			znActivityDaoFake.save(activity);
+
+			znActivityDaoFake.get(12).then(function(dbActivity) {
+				expect(dbActivity.id).toEqual(activity.id);
+				expect(dbActivity instanceof ZnActivity).toBe(true);
+				done();
+			});
+		});
 
 		it('should return error, if activity is not found', function(done) {
 
