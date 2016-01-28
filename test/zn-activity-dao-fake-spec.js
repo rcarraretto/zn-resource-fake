@@ -69,6 +69,31 @@ describe('ZnActivityDaoFake', function() {
 				done();
 			});
 		});
+
+	});
+
+	describe('save (when create)', function() {
+
+		it('should set an id and save values', function(done) {
+
+			var activity = {
+				record: {
+					id: 456
+				}
+			};
+
+			znActivityDaoFake.save(activity)
+				.then(function(activity) {
+					expect(activity.id).toEqual(1);
+					expect(activity.record.id).toEqual(456);
+				})
+				.catch(function(err) {
+					fail(err.status);
+				})
+				.finally(function() {
+					done();
+				});
+		});
 	});
 
 	describe('get', function() {

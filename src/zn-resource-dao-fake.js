@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('lodash');
 var Promise = require('bluebird');
 
 var ZnResourceDaoFake = function() {
@@ -12,6 +13,11 @@ ZnResourceDaoFake.prototype._formatResource = function(resource) {
 
 ZnResourceDaoFake.prototype._returnResource = function(resource) {
 	return Promise.resolve(this._formatResource(resource));
+};
+
+ZnResourceDaoFake.prototype._nextResourceId = function() {
+	var resourceIds = _.values(this.resources);
+	return _.max(resourceIds) || 1;
 };
 
 ZnResourceDaoFake.prototype.get = function(id) {
@@ -28,6 +34,10 @@ ZnResourceDaoFake.prototype.get = function(id) {
 };
 
 ZnResourceDaoFake.prototype.save = function(resource) {
+
+	if (!resource.id) {
+		resource.id = this._nextResourceId();
+	}
 
 	this.resources[resource.id] = resource;
 
