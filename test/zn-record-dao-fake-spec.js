@@ -16,7 +16,7 @@ describe('ZnRecordDaoFake', function() {
 
 		describe('without id', function() {
 
-			it('should set an id (i.e. create) and save values', function() {
+			it('should set an id (i.e. create)', function() {
 
 				var record = {
 					formId: 5,
@@ -26,7 +26,6 @@ describe('ZnRecordDaoFake', function() {
 				return znRecordDaoFake.save(record)
 					.then(function(record) {
 						expect(record.id).to.equal(1);
-						expect(record.field123).to.equal('apples');
 					});
 			});
 
@@ -145,6 +144,34 @@ describe('ZnRecordDaoFake', function() {
 				expect(dbRecords[1]).to.eql(record2);
 				expect(dbRecords[2]).to.eql(record3);
 			});
+		});
+
+		it('should use the highest id creating new records', function() {
+
+			znRecordDaoFake.save({
+				id: 30,
+				formId: 1
+			});
+
+			znRecordDaoFake.save({
+				id: 100,
+				formId: 2
+			});
+
+			var p1 = znRecordDaoFake.save({
+				formId: 1
+			});
+
+			var p2 = znRecordDaoFake.save({
+				formId: 2
+			});
+
+			var checkIds = function(dbRecords) {
+				expect(dbRecords[0].id).to.equal(101);
+				expect(dbRecords[1].id).to.equal(102);
+			};
+
+			return Promise.all([p1, p2]).then(checkIds);
 		});
 
 		describe('when no formId is set', function() {
