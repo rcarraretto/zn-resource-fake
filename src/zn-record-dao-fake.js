@@ -66,9 +66,20 @@ ZnRecordDaoFake.prototype.query = function(request) {
 	return Promise.resolve(response);
 };
 
+ZnRecordDaoFake.prototype._getAllRecords = function() {
+	return _.reduce(this.records, function(allRecords, formRecordsById) {
+
+		var formRecords = _.values(formRecordsById);
+
+		return allRecords.concat(formRecords);
+	}, []);
+};
+
 ZnRecordDaoFake.prototype._nextRecordId = function(formId) {
-	var recordIds = _.values(this.records[formId]);
-	return _.max(recordIds) || 1;
+	var allRecords = this._getAllRecords();
+	var allRecordIds = _.map(allRecords, 'id');
+	var highestId = _.max(allRecordIds) || 0;
+	return highestId + 1;
 };
 
 ZnRecordDaoFake.prototype._get = function(formId, recordId) {

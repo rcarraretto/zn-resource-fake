@@ -1,6 +1,6 @@
 {
   "name": "zn-resource-fake",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Test zengine api on backend plugins using fakes (unofficial)",
   "dependencies": {
     "bluebird": "^3.0.5",
@@ -8,11 +8,10 @@
     "zn-resource": "git://github.com/rcarraretto/zn-resource"
   },
   "devDependencies": {
-    "jasmine": "^2.3.2",
-    "jasmine-spec-reporter": "^2.4.0",
+    "chai": "^3.5.0",
     "jshint": "^2.8.0",
-    "watch": "^0.16.0",
-    "requestify": "^0.1.17"
+    "mocha": "^2.4.5",
+    "watch": "^0.16.0"
   },
   "main": "index.js",
   "directories": {
@@ -21,7 +20,7 @@
   "scripts": {
     "codesmell": "jshint test src index.js",
     "lint": "npm run codesmell -s",
-    "test": "node ./test/support/boot.js",
+    "test": "mocha --reporter min --require test/support/mocha.js",
     "test:watch": "watch 'npm run test -s'",
     "watch": "watch 'npm run test -s || npm run lint -s'"
   },

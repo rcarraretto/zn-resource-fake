@@ -16,27 +16,20 @@ describe('ZnRecordDaoFake', function() {
 
 		describe('without id', function() {
 
-			it('should set an id (i.e. create) and save values', function(done) {
+			it('should set an id (i.e. create)', function() {
 
 				var record = {
 					formId: 5,
 					field123: 'apples'
 				};
 
-				znRecordDaoFake.save(record)
+				return znRecordDaoFake.save(record)
 					.then(function(record) {
-						expect(record.id).toEqual(1);
-						expect(record.field123).toEqual('apples');
-					})
-					.catch(function(err) {
-						fail(err.status);
-					})
-					.finally(function() {
-						done();
+						expect(record.id).to.equal(1);
 					});
 			});
 
-			it('should save values', function(done) {
+			it('should save values', function() {
 
 				var record = {
 					formId: 5,
@@ -52,25 +45,19 @@ describe('ZnRecordDaoFake', function() {
 
 					return znRecordDaoFake.get(compositeId)
 						.then(function(dbRecord) {
-							expect(dbRecord.id).toEqual(savedRecord.id);
-							expect(dbRecord.formId).toEqual(5);
-							expect(dbRecord.field123).toEqual('apples');
-						})
-						.catch(function(err) {
-							fail(err.status);
-						})
-						.finally(function() {
-							done();
+							expect(dbRecord.id).to.equal(savedRecord.id);
+							expect(dbRecord.formId).to.equal(5);
+							expect(dbRecord.field123).to.equal('apples');
 						});
 				};
 
-				znRecordDaoFake.save(record).then(assertWasSaved);
+				return znRecordDaoFake.save(record).then(assertWasSaved);
 			});
 		});
 
 		describe('with id', function() {
 
-			it('should update provided values and preserve the others', function(done) {
+			it('should update provided values and preserve the others', function() {
 
 				var saveInitialRecord = function() {
 
@@ -103,19 +90,18 @@ describe('ZnRecordDaoFake', function() {
 					};
 
 					return znRecordDaoFake.get(compositeId).then(function(dbRecord) {
-						expect(dbRecord.id).toEqual(12);
-						expect(dbRecord.formId).toEqual(5);
-						expect(dbRecord.field1).toEqual('apples');
-						expect(dbRecord.field2).toEqual('ruby');
-						done();
+						expect(dbRecord.id).to.equal(12);
+						expect(dbRecord.formId).to.equal(5);
+						expect(dbRecord.field1).to.equal('apples');
+						expect(dbRecord.field2).to.equal('ruby');
 					});
 				};
 
-				saveInitialRecord().then(updateRecord).then(assertWasUpdated);
+				return saveInitialRecord().then(updateRecord).then(assertWasUpdated);
 			});
 		});
 
-		it('should save different records', function(done) {
+		it('should save different records', function() {
 
 			var record1 = {
 				id: 12,
@@ -153,36 +139,55 @@ describe('ZnRecordDaoFake', function() {
 				id: 100
 			});
 
-			Promise.all([p1, p2, p3]).then(function(dbRecords) {
-				expect(dbRecords[0]).toEqual(record1);
-				expect(dbRecords[1]).toEqual(record2);
-				expect(dbRecords[2]).toEqual(record3);
-			})
-			.catch(function(err) {
-				fail(err);
-			})
-			.finally(function() {
-				done();
+			return Promise.all([p1, p2, p3]).then(function(dbRecords) {
+				expect(dbRecords[0]).to.eql(record1);
+				expect(dbRecords[1]).to.eql(record2);
+				expect(dbRecords[2]).to.eql(record3);
 			});
+		});
+
+		it('should use the highest id creating new records', function() {
+
+			znRecordDaoFake.save({
+				id: 30,
+				formId: 1
+			});
+
+			znRecordDaoFake.save({
+				id: 100,
+				formId: 2
+			});
+
+			var p1 = znRecordDaoFake.save({
+				formId: 1
+			});
+
+			var p2 = znRecordDaoFake.save({
+				formId: 2
+			});
+
+			var checkIds = function(dbRecords) {
+				expect(dbRecords[0].id).to.equal(101);
+				expect(dbRecords[1].id).to.equal(102);
+			};
+
+			return Promise.all([p1, p2]).then(checkIds);
 		});
 
 		describe('when no formId is set', function() {
 
-			it('should reject as not found', function(done) {
+			it('should reject as not found', function() {
 
 				var record = {
 					field123: 'apples'
 				};
 
-				znRecordDaoFake.save(record)
+				return znRecordDaoFake.save(record)
 					.then(function() {
 						fail();
 					})
 					.catch(function(err) {
-						expect(err.status).toEqual(404);
-					})
-					.finally(function() {
-						done();
+						expect(err.status).to.equal(404);
 					});
 			});
 		});
@@ -190,7 +195,7 @@ describe('ZnRecordDaoFake', function() {
 
 	describe('get', function() {
 
-		it('should return error, if form id does not match', function(done) {
+		it('should return error, if form id does not match', function() {
 
 			var record = {
 				id: 12,
@@ -199,7 +204,7 @@ describe('ZnRecordDaoFake', function() {
 
 			znRecordDaoFake.save(record);
 
-			znRecordDaoFake.get({
+			return znRecordDaoFake.get({
 				formId: 6,
 				id: 12
 			})
@@ -207,17 +212,14 @@ describe('ZnRecordDaoFake', function() {
 				fail();
 			})
 			.catch(function(err) {
-				expect(err.status).toEqual(404);
-			})
-			.finally(function() {
-				done();
+				expect(err.status).to.equal(404);
 			});
 		});
 	});
 
 	describe('query', function() {
 
-		it('should query records belonging to a form', function(done) {
+		it('should query records belonging to a form', function() {
 
 			var record1 = {
 				id: 12,
@@ -240,45 +242,33 @@ describe('ZnRecordDaoFake', function() {
 
 			znRecordDaoFake.save(record3);
 
-			znRecordDaoFake.query({
+			return znRecordDaoFake.query({
 				formId: 5
 			})
 			.then(function(result) {
-				expect(result.totalCount).toEqual(2);
-				expect(result.data[0]).toEqual(record1);
-				expect(result.data[1]).toEqual(record2);
-			})
-			.catch(function(err) {
-				fail(err);
-			})
-			.finally(function() {
-				done();
+				expect(result.totalCount).to.equal(2);
+				expect(result.data[0]).to.equal(record1);
+				expect(result.data[1]).to.equal(record2);
 			});
 		});
 
 		describe('when no records are found', function() {
 
-			it('should return totalCount 0 and empty data array', function(done) {
+			it('should return totalCount 0 and empty data array', function() {
 
-				znRecordDaoFake.query({
+				return znRecordDaoFake.query({
 					formId: 5
 				})
 				.then(function(result) {
-					expect(result.totalCount).toEqual(0);
-					expect(result.data).toEqual([]);
-				})
-				.catch(function(err) {
-					fail(err);
-				})
-				.finally(function() {
-					done();
+					expect(result.totalCount).to.equal(0);
+					expect(result.data).to.eql([]);
 				});
 			});
 		});
 
 		describe('with field123 param as string', function() {
 
-			it('should filter by field', function(done) {
+			it('should filter by field', function() {
 
 				var record1 = {
 					id: 12,
@@ -307,24 +297,18 @@ describe('ZnRecordDaoFake', function() {
 					field123: 'apples'
 				};
 
-				znRecordDaoFake.query(request)
+				return znRecordDaoFake.query(request)
 					.then(function(result) {
-						expect(result.totalCount).toEqual(2);
-						expect(result.data[0]).toEqual(record1);
-						expect(result.data[1]).toEqual(record3);
-					})
-					.catch(function(err) {
-						fail(err);
-					})
-					.finally(function() {
-						done();
+						expect(result.totalCount).to.equal(2);
+						expect(result.data[0]).to.equal(record1);
+						expect(result.data[1]).to.equal(record3);
 					});
 			});
 		});
 
 		describe('with field123 param as array', function() {
 
-			it('should filter by field values as OR statement', function(done) {
+			it('should filter by field values as OR statement', function() {
 
 				var record1 = {
 					id: 12,
@@ -353,22 +337,16 @@ describe('ZnRecordDaoFake', function() {
 					field123: ['apples', 'strawberries']
 				};
 
-				znRecordDaoFake.query(request)
+				return znRecordDaoFake.query(request)
 					.then(function(result) {
-						expect(result.totalCount).toEqual(2);
-						expect(result.data[0]).toEqual(record1);
-						expect(result.data[1]).toEqual(record3);
-					})
-					.catch(function(err) {
-						fail(err);
-					})
-					.finally(function() {
-						done();
+						expect(result.totalCount).to.equal(2);
+						expect(result.data[0]).to.equal(record1);
+						expect(result.data[1]).to.equal(record3);
 					});
 			});
 		});
 
-		it('should not use limit and page params to filter values', function(done) {
+		it('should not use limit and page params to filter values', function() {
 
 			var record1 = {
 				id: 12,
@@ -399,34 +377,25 @@ describe('ZnRecordDaoFake', function() {
 				limit: 500
 			};
 
-			znRecordDaoFake.query(request)
+			return znRecordDaoFake.query(request)
 				.then(function(result) {
-					expect(result.totalCount).toEqual(2);
-					expect(result.data[0]).toEqual(record1);
-					expect(result.data[1]).toEqual(record3);
-				})
-				.catch(function(err) {
-					fail(err);
-				})
-				.finally(function() {
-					done();
+					expect(result.totalCount).to.equal(2);
+					expect(result.data[0]).to.equal(record1);
+					expect(result.data[1]).to.equal(record3);
 				});
 		});
 
-		it('should keep request as is', function(done) {
+		it('should keep request as is', function() {
 
 			var request = {
 				formId: 5
 			};
 
-			znRecordDaoFake.query(request)
+			return znRecordDaoFake.query(request)
 				.then(function(result) {
-					expect(request).toEqual({
+					expect(request).to.eql({
 						formId: 5
 					});
-				})
-				.finally(function() {
-					done();
 				});
 		});
 	});
