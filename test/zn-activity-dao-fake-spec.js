@@ -15,7 +15,7 @@ describe('ZnActivityDaoFake', function() {
 
 	describe('save', function() {
 
-		it('should save activity', function(done) {
+		it('should save activity', function() {
 
 			var activity = {
 				id: 12
@@ -23,13 +23,12 @@ describe('ZnActivityDaoFake', function() {
 
 			znActivityDaoFake.save(activity);
 
-			znActivityDaoFake.get(12).then(function(dbActivity) {
-				expect(dbActivity.id).toEqual(activity.id);
-				done();
+			return znActivityDaoFake.get(12).then(function(dbActivity) {
+				expect(dbActivity.id).to.equal(activity.id);
 			});
 		});
 
-		it('should save different activities', function(done) {
+		it('should save different activities', function() {
 
 			var activity1 = {
 				id: 12
@@ -45,28 +44,21 @@ describe('ZnActivityDaoFake', function() {
 			var p1 = znActivityDaoFake.get(12);
 			var p2 = znActivityDaoFake.get(13);
 
-			Promise.all([p1, p2]).then(function(dbActivities) {
-				expect(dbActivities[0].id).toEqual(activity1.id);
-				expect(dbActivities[1].id).toEqual(activity2.id);
-			})
-			.catch(function(err) {
-				fail(err);
-			})
-			.finally(function() {
-				done();
+			return Promise.all([p1, p2]).then(function(dbActivities) {
+				expect(dbActivities[0].id).to.equal(activity1.id);
+				expect(dbActivities[1].id).to.equal(activity2.id);
 			});
 		});
 
-		it('should return saved activity as resolved promised', function(done) {
+		it('should return saved activity as resolved promised', function() {
 
 			var activity = {
 				id: 12
 			};
 
-			znActivityDaoFake.save(activity).then(function(dbActivity) {
-				expect(dbActivity.id).toEqual(activity.id);
-				expect(dbActivity instanceof ZnActivity).toBe(true);
-				done();
+			return znActivityDaoFake.save(activity).then(function(dbActivity) {
+				expect(dbActivity.id).to.equal(activity.id);
+				expect(dbActivity instanceof ZnActivity).to.equal(true);
 			});
 		});
 
@@ -74,7 +66,7 @@ describe('ZnActivityDaoFake', function() {
 
 	describe('save (when create)', function() {
 
-		it('should set an id and save values', function(done) {
+		it('should set an id and save values', function() {
 
 			var activity = {
 				record: {
@@ -82,47 +74,37 @@ describe('ZnActivityDaoFake', function() {
 				}
 			};
 
-			znActivityDaoFake.save(activity)
+			return znActivityDaoFake.save(activity)
 				.then(function(activity) {
-					expect(activity.id).toEqual(1);
-					expect(activity.record.id).toEqual(456);
-				})
-				.catch(function(err) {
-					fail(err.status);
-				})
-				.finally(function() {
-					done();
+					expect(activity.id).to.equal(1);
+					expect(activity.record.id).to.equal(456);
 				});
 		});
 	});
 
 	describe('get', function() {
 
-		it('should return activity as resolved promised', function(done) {
+		it('should return activity as resolved promised', function() {
 
 			var activity = {
 				id: 12
 			};
 			znActivityDaoFake.save(activity);
 
-			znActivityDaoFake.get(12).then(function(dbActivity) {
-				expect(dbActivity.id).toEqual(activity.id);
-				expect(dbActivity instanceof ZnActivity).toBe(true);
-				done();
+			return znActivityDaoFake.get(12).then(function(dbActivity) {
+				expect(dbActivity.id).to.equal(activity.id);
+				expect(dbActivity instanceof ZnActivity).to.equal(true);
 			});
 		});
 
-		it('should return error, if activity is not found', function(done) {
+		it('should return error, if activity is not found', function() {
 
-			znActivityDaoFake.get(12)
+			return znActivityDaoFake.get(12)
 				.then(function(dbRecord) {
 					fail();
 				})
 				.catch(function(err) {
-					expect(err.status).toEqual(404);
-				})
-				.finally(function() {
-					done();
+					expect(err.status).to.equal(404);
 				});
 		});
 	});
