@@ -14,6 +14,10 @@ var instantiateResourceService = function(options) {
 		return factory.ZnActivityDao();
 	}
 
+	if (options.resource === 'note') {
+		return factory.ZnNoteDao();
+	}
+
 	throw new Error('ZnResourceFake: invalid resource: ' + options.resource);
 };
 

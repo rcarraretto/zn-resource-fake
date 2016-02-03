@@ -22,6 +22,10 @@ ZnResourceDaoFake.prototype._nextResourceId = function() {
 
 ZnResourceDaoFake.prototype.get = function(id) {
 
+	if (_.isObject(id)) {
+		id = id.id;
+	}
+
 	var resource = this.resources[id];
 
 	if (!resource) {
