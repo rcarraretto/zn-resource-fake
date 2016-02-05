@@ -24,6 +24,7 @@
   "node": true,
 
   "jasmine": true,
+  "expr": true,
 
   "devel": true
 }

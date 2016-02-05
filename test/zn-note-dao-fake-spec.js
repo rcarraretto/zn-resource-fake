@@ -2,8 +2,6 @@
 
 describe('znNoteDaoFake', function() {
 
-	var Promise = require('bluebird');
-
 	var znNoteDaoFake;
 
 	beforeEach(function() {
