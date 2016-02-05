@@ -346,6 +346,52 @@ describe('ZnRecordDaoFake', function() {
 			});
 		});
 
+		describe('with field123 param as linked record id', function() {
+
+			it("should filter by 'id' property of field value", function() {
+
+				var record1 = {
+					id: 12,
+					formId: 5,
+					field123: {
+						id: 1000
+					}
+				};
+
+				var record2 = {
+					id: 13,
+					formId: 5,
+					field123: {
+						id: 500
+					}
+				};
+
+				var record3 = {
+					id: 14,
+					formId: 5,
+					field123: {
+						id: 1000
+					}
+				};
+
+				znRecordDaoFake.save(record1);
+				znRecordDaoFake.save(record2);
+				znRecordDaoFake.save(record3);
+
+				var request = {
+					formId: 5,
+					field123: 1000
+				};
+
+				return znRecordDaoFake.query(request)
+					.then(function(result) {
+						expect(result.totalCount).to.equal(2);
+						expect(result.data[0]).to.equal(record1);
+						expect(result.data[1]).to.equal(record3);
+					});
+			});
+		});
+
 		it('should not use limit and page params to filter values', function() {
 
 			var record1 = {

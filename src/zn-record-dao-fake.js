@@ -27,7 +27,7 @@ ZnRecordDaoFake.prototype.get = function(compositeId) {
 		return notFound();
 	}
 
-	return resolveCopy(record); // TODO: test is copy
+	return resolveCopy(record);
 };
 
 var filterRecords = function(records, allParams) {
@@ -36,12 +36,21 @@ var filterRecords = function(records, allParams) {
 	delete params.limit;
 	delete params.page;
 
-	_.forEach(params, function(value, key) {
+	_.forEach(params, function(param, key) {
+
 		records = _.filter(records, function(record) {
-			if (_.isArray(value)) {
-				return _.includes(value, record[key]);
+
+			var recordAttributeValue = record[key];
+
+			if (_.isObject(recordAttributeValue)) {
+				recordAttributeValue = recordAttributeValue.id;
 			}
-			return record[key] === value;
+
+			if (_.isArray(param)) {
+				return _.includes(param, recordAttributeValue);
+			}
+
+			return recordAttributeValue === param;
 		});
 	});
 
@@ -56,7 +65,7 @@ ZnRecordDaoFake.prototype.query = function(request) {
 
 	var formRecords = _.values(this.records[formId]);
 
-	formRecords = filterRecords(formRecords, params); // TODO: should be copy
+	formRecords = filterRecords(formRecords, params);
 
 	var response = {
 		data: formRecords,
@@ -112,7 +121,7 @@ ZnRecordDaoFake.prototype._create = function(record) {
 
 	this._set(formId, record);
 
-	return resolveCopy(record); // TODO: test is copy
+	return resolveCopy(record);
 };
 
 ZnRecordDaoFake.prototype._update = function(record) {
@@ -127,7 +136,7 @@ ZnRecordDaoFake.prototype._update = function(record) {
 
 	this._set(formId, record);
 
-	return resolveCopy(record); // TODO: test is copy
+	return resolveCopy(record);
 };
 
 ZnRecordDaoFake.prototype.save = function(record) {
