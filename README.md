@@ -14,7 +14,6 @@ Same interface as zn-resource, except you don't need to inject ZnHttp – all re
 
 ```js
 var znRecordService = require('zn-resource-fake')({ resource: 'record' });
-var znFormService = require('zn-resource-fake')({ resource: 'form' });
 var znActivityService = require('zn-resource-fake')({ resource: 'activity' });
 ```
 
